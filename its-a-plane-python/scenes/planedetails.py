@@ -1,4 +1,7 @@
-from rgbmatrix import graphics
+try:
+    from rgbmatrix import graphics
+except ImportError:
+    from RGBMatrixEmulator import graphics
 from utilities.animator import Animator
 from setup import colours, fonts, screen
 from config import DISTANCE_UNITS

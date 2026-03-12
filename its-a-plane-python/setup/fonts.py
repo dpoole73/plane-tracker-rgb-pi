@@ -1,6 +1,8 @@
 import os
-from rgbmatrix import graphics
-
+try:
+    from rgbmatrix import graphics
+except ImportError:
+    from RGBMatrixEmulator import graphics
 # Fonts
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 extrasmall = graphics.Font()

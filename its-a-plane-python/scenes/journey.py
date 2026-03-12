@@ -1,6 +1,9 @@
 from utilities.animator import Animator
 from setup import colours, fonts
-from rgbmatrix import graphics
+try:
+    from rgbmatrix import graphics
+except ImportError:
+    from RGBMatrixEmulator import graphics
 from config import DISTANCE_UNITS
 
 try:

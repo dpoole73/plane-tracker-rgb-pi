@@ -47,7 +47,8 @@ def get_session() -> Session:
             read=3,
             backoff_factor=2,
             allowed_methods=["GET", "POST"],
-            status_forcelist=[429, 500, 502, 503, 504],
+            # removed 429 as retry on that won't help
+            status_forcelist=[500, 502, 503, 504],
             raise_on_status=False,
         )
 

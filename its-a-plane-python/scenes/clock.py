@@ -2,12 +2,15 @@ from datetime import datetime
 from utilities.temperature import grab_forecast
 from utilities.animator import Animator
 from setup import colours, fonts, frames
-from rgbmatrix import graphics
-import logging
+try:
+    from rgbmatrix import graphics
+except ImportError:
+    from RGBMatrixEmulator import graphics
 from config import CLOCK_FORMAT, NIGHT_END, NIGHT_START
+import logging
 
 # Configure logging
-#logging.basicConfig(filename='myapp.log', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='myapp.log', level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # Setup
 CLOCK_FONT = fonts.large_bold
@@ -59,7 +62,7 @@ class ClockScene(object):
 
     @Animator.KeyFrame.add(frames.PER_SECOND * 1)
     def clock(self, count):
-        if len(self._data):
+        if len(self._data) or not(self._show_weather):
             self._redraw_time = True
             return
 
@@ -76,6 +79,9 @@ class ClockScene(object):
             clock_color = DAY_COLOUR
         else:
             clock_color = NIGHT_COLOUR
+
+        # always clear the clock area
+        self.draw_square(0, 0, 40, 11, colours.BLACK)
 
         if self._last_time and (self._last_time != current_time or getattr(self, "_redraw_time", False)):
             graphics.DrawText(

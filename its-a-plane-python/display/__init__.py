@@ -13,9 +13,17 @@ from scenes.clock import ClockScene
 from scenes.planedetails import PlaneDetailsScene
 from scenes.daysforecast import DaysForecastScene
 from scenes.date import DateScene
+from scenes.stockprice import StockPriceScene
+from scenes.solar import SolarScene
+from scenes.scenemanager import SceneManager
 
-from rgbmatrix import graphics
-from rgbmatrix import RGBMatrix, RGBMatrixOptions
+
+try:
+    from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
+except ImportError:
+    from RGBMatrixEmulator import graphics, RGBMatrix, RGBMatrixOptions
+
+
 
 
 def flight_updated(flights_a, flights_b):
@@ -78,6 +86,9 @@ class Display(
     ClockScene,
     DaysForecastScene,
     DateScene,
+    StockPriceScene,
+    SolarScene,
+    SceneManager,
     Animator,
 ):
     def __init__(self):
@@ -119,6 +130,11 @@ class Display(
         # Overwrite any default settings from
         # Animator or Scenes
         self.delay = frames.PERIOD
+
+        #initialize the non-plane views
+        self._show_weather = False
+        self._show_stock = False
+        self._show_solar = False
 
     def draw_square(self, x0, y0, x1, y1, colour):
         for x in range(x0, x1):

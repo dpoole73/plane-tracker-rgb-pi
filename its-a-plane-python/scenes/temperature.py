@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 import colorsys
-from rgbmatrix import graphics
+try:
+    from rgbmatrix import graphics
+except ImportError:
+    from RGBMatrixEmulator import graphics
 from utilities.animator import Animator
 from setup import colours, fonts, frames, screen
 from utilities.temperature import grab_temperature_and_humidity
@@ -32,11 +35,17 @@ class TemperatureScene(object):
 
     @Animator.KeyFrame.add(frames.PER_SECOND * 1)
     def temperature(self, count):
+
         # Redraw at night start/end to adjust brightness
         now = datetime.now().replace(microsecond=0).time()
         if now == NIGHT_START_TIME.time() or now == NIGHT_END_TIME.time():
             self._redraw_temp = True
             return  
+        
+        # only draw if told to by scene manager
+
+        if not(self._show_weather):
+            return
 
         # Ensure redraw when there's new data
         if len(self._data):
@@ -87,6 +96,7 @@ class TemperatureScene(object):
                 display_str = f"{round(current_temperature)}°"
                 humidity_ratio = current_humidity / 100.0
                 temp_colour = self.colour_gradient(colours.WHITE, colours.DARK_BLUE, humidity_ratio)
+
 
             # Update state
             self._last_temperature_str = display_str

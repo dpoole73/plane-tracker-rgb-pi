@@ -2,7 +2,10 @@ from datetime import datetime
 from utilities.temperature import grab_forecast
 from utilities.animator import Animator
 from setup import colours, fonts, frames
-from rgbmatrix import graphics
+try:
+    from rgbmatrix import graphics
+except ImportError:
+    from RGBMatrixEmulator import graphics
 import logging
 from config import NIGHT_START, NIGHT_END
 
@@ -102,7 +105,11 @@ class DateScene(object):
         if len(self._data):
             self._redraw_date = True
             return 
-
+        
+        # date is only disaplayed in weather view
+        if not(self._show_weather):
+            return
+        
         # Get moon phase
         moon_phase_value = self.moonphase()
         if moon_phase_value is None:

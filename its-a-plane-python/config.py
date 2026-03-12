@@ -28,3 +28,18 @@ EMAIL = "" #insert your email address between the " ie "example@example.com" to 
 MAX_FARTHEST = 3 #the amount of furthest flights you want in your log
 MAX_CLOSEST = 3 #the amount of closest flights to your house you want in your log
 
+SOLAR_API_KEY = "XXX" # api key for this app
+SOLAR_AUTH_CODE = "XXX" # code based on user authentication allowing access to our account
+SOLAR_REDIRECT_URI = "https://api.enphaseenergy.com/oauth/redirect_uri"
+SOLAR_SYSTEM_ID = "XXXXX" # your system id
+SOLAR_ENDPOINT = "https://api.enphaseenergy.com/api/v4/systems"
+SOLAR_CLIENT_ID= "XXXX"
+SOLAR_CLIENT_SECRET = "XXXX"
+# can't use the auth code above more than once so we will stire this for now instead
+SOLAR_REFRESH_TOKEN = "XXXX"
+
+# sign up for an API key here https://www.alphavantage.co/support/#api-key
+STOCK_API_KEY = "XXXXX"
+STOCK_SYMBOL = "XXXXX"
+STOCK_REFRESH_SECONDS = 300
+STOCK_DISPLAY_SECONDS = 10

@@ -1,5 +1,7 @@
-from rgbmatrix import graphics
-
+try:
+    from rgbmatrix import graphics
+except ImportError:
+    from RGBMatrixEmulator import graphics
 # Colour helpers from lightest to darkest
 
 WHITE = graphics.Color(255, 255, 255)

@@ -5,7 +5,10 @@ from utilities.animator import Animator
 from setup import colours, fonts, frames, screen
 from utilities.temperature import grab_forecast
 from config import NIGHT_START, NIGHT_END
-from rgbmatrix import graphics
+try:
+    from rgbmatrix import graphics
+except ImportError:
+    from RGBMatrixEmulator import graphics
 
 # Setup
 DAY_COLOUR = colours.LIGHT_PINK
@@ -31,6 +34,12 @@ class DaysForecastScene(object):
 
     @Animator.KeyFrame.add(frames.PER_SECOND * 1)
     def day(self, count):
+
+        # only show if told to by scene manager
+        if not(self._show_weather):
+            self._redraw_forecast = True
+            return
+        
         # Ensure redraw when there's new scene selection or midnight brightness events
         now = datetime.now().replace(microsecond=0).time()
         if now == NIGHT_START_TIME.time() or now == NIGHT_END_TIME.time():
