@@ -8,6 +8,7 @@ from requests import Session
 from requests.adapters import HTTPAdapter
 from requests.exceptions import RequestException
 from urllib3.util.retry import Retry
+from pathlib import Path
 
 # Attempt to load config data
 try:
@@ -42,6 +43,26 @@ def is_dns_error(exc: Exception) -> bool:
 _session = None
 _bearer_token = ""
 _bearer_token_generation_time = datetime.min
+_refresh_token = ""
+TOKEN_FILE = Path("solar_token.txt")
+
+def load_refresh_token(config_token: str) -> str:
+    """Load refresh token from file if present, otherwise use config value."""
+    global TOKEN_FILE
+    if TOKEN_FILE.exists():
+        with open(TOKEN_FILE, "r") as f:
+            token = f.read().strip()
+            if token:
+                return token
+
+    return config_token
+
+
+def save_refresh_token(token: str):
+    """Save refresh token to cache file."""
+    global TOKEN_FILE
+    with open(TOKEN_FILE, "w") as f:
+        f.write(token)
 
 def get_session() -> Session:
     global _session
@@ -74,7 +95,9 @@ def get_session() -> Session:
 def grab_solar_data():
     global _bearer_token_generation_time
     global _bearer_token
+    global _refresh_token
     try:
+        _refresh_token = load_refresh_token(SOLAR_REFRESH_TOKEN)
         s = get_session()
         if _bearer_token_generation_time + timedelta(days=1) + timedelta(minutes=10) < datetime.now() :
             # generate the bearer token (can only do this once with auth code so comment out for now)
@@ -94,7 +117,7 @@ def grab_solar_data():
                 auth=(SOLAR_CLIENT_ID, SOLAR_CLIENT_SECRET),
                 params={
                     "grant_type": "refresh_token",
-                    "refresh_token" : SOLAR_REFRESH_TOKEN,
+                    "refresh_token" : _refresh_token,
                 },
                 timeout=(5, 20)
             )
@@ -107,6 +130,8 @@ def grab_solar_data():
 
             _bearer_token = request.json().get("access_token")
             _bearer_token_generation_time = datetime.now()
+            _refresh_token = request.json().get("refresh_token")
+            save_refresh_token(_refresh_token)
         
         # now we have the bearer token so we can use that to get data
 
