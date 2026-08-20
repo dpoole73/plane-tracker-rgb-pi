@@ -22,6 +22,7 @@ class FlightDetailsScene(object):
     def __init__(self):
         super().__init__()
         self.flight_position = screen.WIDTH
+        self.flight_details_complete = False
         self._data_all_looped = False
 
     @Animator.KeyFrame.add(1)
@@ -29,6 +30,10 @@ class FlightDetailsScene(object):
 
         # Guard against no data
         if len(self._data) == 0:
+            return
+
+        # Skip rendering after scroll complete (waiting for other regions)
+        if self.flight_details_complete:
             return
 
         # Clear the whole area
@@ -46,14 +51,16 @@ class FlightDetailsScene(object):
         owner_icao = self._data[self._data_index]["owner_icao"]
 
         if callsign and callsign != "N/A":
-            # Remove icao from flight number
-            if owner_icao and callsign.startswith(owner_icao):
+            airline = self._data[self._data_index]["airline"]
+
+            # For private flights keep the full registration; for airlines strip the ICAO prefix
+            if airline == "Private":
+                flight_no = callsign
+            elif owner_icao and callsign.startswith(owner_icao):
                 flight_no = callsign[len(owner_icao):]
             else:
                 flight_no = callsign
-            
-            # Add airline name if there is one
-            airline = self._data[self._data_index]["airline"]
+
             if airline:
                 flight_no = f"{airline} {flight_no}"
 
@@ -97,13 +104,15 @@ class FlightDetailsScene(object):
         # Handle scrolling
         self.flight_position -= 1
         if self.flight_position + flight_no_text_length < 0:
-            self.flight_position = screen.WIDTH
             if len(self._data) > 1:
-                self._data_index = (self._data_index + 1) % len(self._data)
-                self._data_all_looped = (not self._data_index) or self._data_all_looped
-                self.reset_scene()
+                # Mark complete and wait for other regions
+                self.flight_details_complete = True
+                self.mark_scroll_complete("flight_details")
+            else:
+                self.flight_position = screen.WIDTH
 
     @Animator.KeyFrame.add(0)
-    def reset_scrolling(self):
+    def reset_flight_details_scroll(self):
         self.flight_position = screen.WIDTH
+        self.flight_details_complete = False
 
